@@ -1,0 +1,62 @@
+function varargout=watermark_k(varargin)
+% varargin  :  merupakan variabel input dalam sebuah pernyataan definisi
+% fungsi yang memungkinkan fungsi untuk menerima sejumlah argumen input.
+
+% varargout : merupakan variabel output dalam sebuah pernyataan definisi
+% fungsi yang memungkinkan fungsi untuk mengembalikan sejumlah argumen output
+
+% bitand : Bit-wise AND
+%
+if length(varargin)<2
+    return
+elseif length(varargin)==3
+    rand('seed',varargin{3});
+end
+
+img=varargin{1};
+stringa=varargin{2};
+
+im=img(:);
+if (length(stringa)+1)<=(length(im)/8)
+    im=bitand(im,uint8(ones(length(im),1)*254));
+    t_im=uint8(zeros(length(im),1));
+
+    if length(varargin)==3
+        k=randperm(length(im));
+    end
+
+    for i=1:length(stringa)
+        for j=1:8
+            if length(varargin)==3
+                index=k((i-1)*8 + j);
+            else
+                index=(i-1)*8 + j;
+            end
+            b=bitget(uint8(stringa(i)),j);
+            if(b==1)
+                t_im(index)=bitset(t_im(index),1);
+            end
+        end
+    end
+
+    for j=1:8
+            if length(varargin)==3
+                index=k(length(stringa)*8 + j);
+            else
+                index=length(stringa)*8 + j;
+            end
+            t_im(index)=bitset(t_im(index),1);
+    end
+
+    r_im=bitor(im,t_im);
+    [x,y,z]=size(img);
+    img_w=reshape(r_im,x,y,z);
+
+    varargout{1}=img_w;
+    varargout{2}='WATERMARK BERHASIL!';
+
+else
+        varargout{2}='Karakter Terlalu Panjang!';
+end
+
+end
